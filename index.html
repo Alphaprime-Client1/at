@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>404 - You Lost The Page</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #f3f3e9;
+    color: #1c1b19;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* HEADER */
+
+header {
+    height: 75px;
+    padding: 15px 3%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: cursive;
+    color: #ed352b;
+    font-size: 32px;
+    font-weight: bold;
+    transform: rotate(-5deg);
+}
+
+.heart-icon {
+    color: #ed352b;
+    font-size: 35px;
+}
+
+/* MAIN CONTENT */
+
+main {
+    width: 100%;
+    max-width: 1450px;
+    margin: auto;
+    padding: 0 25px;
+}
+
+.heading {
+    text-align: center;
+    margin: 5px 0 35px;
+}
+
+.heading h1 {
+    font-family: Impact, sans-serif;
+    font-size: clamp(30px, 4vw, 48px);
+    line-height: 1.02;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.score {
+    font-family: monospace;
+    font-size: 13px;
+    color: #77776e;
+    margin-top: 14px;
+}
+
+/* GAME AREA */
+
+.game-area {
+    display: grid;
+    grid-template-columns: 1fr minmax(250px, 580px) 1fr;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.number {
+    font-family: Impact, sans-serif;
+    font-size: clamp(180px, 35vw, 650px);
+    line-height: 0.9;
+    text-align: center;
+    font-weight: bold;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    max-width: 580px;
+}
+
+.cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: clamp(35px, 7vw, 95px);
+    cursor: pointer;
+    user-select: none;
+    border-right: 3px solid #1c1b19;
+    border-bottom: 3px solid #1c1b19;
+    transition: background 0.2s;
+}
+
+.cell:nth-child(3n) {
+    border-right: none;
+}
+
+.cell:nth-child(n+7) {
+    border-bottom: none;
+}
+
+.cell:hover {
+    background: rgba(0,0,0,0.04);
+}
+
+.cell.x {
+    color: #1c1b19;
+    font-weight: bold;
+}
+
+.cell.heart {
+    color: #ed352b;
+}
+
+/* GAME MESSAGE */
+
+.game-message {
+    text-align: center;
+    margin-top: 25px;
+    font-family: monospace;
+    font-size: 14px;
+    min-height: 20px;
+}
+
+/* BUTTONS */
+
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 35px;
+    margin: 35px 0;
+}
+
+.actions button {
+    background: transparent;
+    border: none;
+    font-family: monospace;
+    font-size: 13px;
+    cursor: pointer;
+    color: #1c1b19;
+    padding: 10px;
+}
+
+.actions button:hover {
+    color: #ed352b;
+}
+
+/* MOBILE */
+
+@media(max-width: 650px) {
+
+    header {
+        height: 65px;
+    }
+
+    .heading {
+        margin: 25px 0;
+    }
+
+    .heading h1 {
+        font-size: 29px;
+    }
+
+    .game-area {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .number {
+        display: none;
+    }
+
+    .board {
+        max-width: 340px;
+        margin: auto;
+    }
+
+    .cell {
+        font-size: 55px;
+    }
+
+    .actions {
+        gap: 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">Sruthi♥</div>
+    <div class="heart-icon">≋♥≋</div>
+</header>
+
+<main>
+
+    <section class="heading">
+
+        <h1>
+            YOU LOST THE PAGE.<br>
+            YOU'LL LOSE THIS GAME, TOO.
+        </h1>
+
+        <div class="score">
+            SRUTHI <span id="sruthiScore">0</span>
+            ·
+            YOU <span id="youScore">0</span>
+        </div>
+
+    </section>
+
+
+    <section class="game-area">
+
+        <div class="number">4</div>
+
+        <div class="board" id="board">
+
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+
+        </div>
+
+        <div class="number">4</div>
+
+    </section>
+
+
+    <div class="game-message" id="message">
+        Your turn. Good luck! :)
+    </div>
+
+
+    <section class="actions">
+
+        <button onclick="resetGame()">
+            [ LOSE AGAIN ]
+        </button>
+
+        <button onclick="goHome()">
+            [ TAKE ME HOME ]
+        </button>
+
+    </section>
+
+</main>
+
+
+<script>
+
+// GAME SETTINGS
+
+const board = document.querySelectorAll(".cell");
+
+let game = Array(9).fill("");
+let gameOver = false;
+
+let sruthiScore = 0;
+let youScore = 0;
+
+const message = document.getElementById("message");
+
+
+// USER MOVE
+
+board.forEach((cell, index) => {
+
+    cell.addEventListener("click", () => {
+
+        if (gameOver || game[index] !== "") return;
+
+        // User plays X
+        game[index] = "X";
+
+        cell.textContent = "X";
+        cell.classList.add("x");
+
+        if (checkWinner("X")) {
+            youScore++;
+            updateScore();
+            message.textContent = "You won! Impossible! 😂";
+            gameOver = true;
+            return;
+        }
+
+        if (checkDraw()) {
+            message.textContent = "Draw! Try again.";
+            gameOver = true;
+            return;
+        }
+
+        // Sruthi's turn
+        message.textContent = "Sruthi is thinking...";
+
+        setTimeout(computerMove, 500);
+
+    });
+
+});
+
+
+// COMPUTER MOVE
+
+function computerMove() {
+
+    if (gameOver) return;
+
+    const available = game
+        .map((value, index) => value === "" ? index : null)
+        .filter(value => value !== null);
+
+    if (available.length === 0) return;
+
+    const randomIndex =
+        available[Math.floor(Math.random() * available.length)];
+
+    game[randomIndex] = "♥";
+
+    board[randomIndex].textContent = "♥";
+    board[randomIndex].classList.add("heart");
+
+    if (checkWinner("♥")) {
+
+        sruthiScore++;
+        updateScore();
+
+        message.textContent = "Sruthi wins! Told you! ❤️";
+        gameOver = true;
+
+        return;
+    }
+
+    if (checkDraw()) {
+        message.textContent = "Draw! Try again.";
+        gameOver = true;
+        return;
+    }
+
+    message.textContent = "Your turn. Don't disappoint!";
+}
+
+
+// WINNING CONDITIONS
+
+const winningPatterns = [
+
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+
+    [0, 4, 8],
+    [2, 4, 6]
+
+];
+
+function checkWinner(player) {
+
+    return winningPatterns.some(pattern => {
+
+        return pattern.every(index => game[index] === player);
+
+    });
+
+}
+
+
+// DRAW CHECK
+
+function checkDraw() {
+
+    return game.every(value => value !== "");
+
+}
+
+
+// UPDATE SCORE
+
+function updateScore() {
+
+    document.getElementById("sruthiScore").textContent = sruthiScore;
+
+    document.getElementById("youScore").textContent = youScore;
+
+}
+
+
+// RESET GAME
+
+function resetGame() {
+
+    game = Array(9).fill("");
+    gameOver = false;
+
+    board.forEach(cell => {
+
+        cell.textContent = "";
+        cell.className = "cell";
+
+    });
+
+    message.textContent = "Play again. Good luck! ❤️";
+
+}
+
+
+// HOME BUTTON
+
+function goHome() {
+
+    message.textContent = "Home is not available. You're stuck here! 😂";
+
+}
+
+
+// HIDDEN CONSOLE EASTER EGG
+
+Object.defineProperty(window, "PRIME", {
+
+    configurable: true,
+
+    get: function() {
+
+        console.log(
+            "%c HELLO PRIME ",
+            "background:#1c1b19;color:#ed352b;font-size:30px;font-weight:bold;padding:15px;"
+        );
+
+        return "Access Granted!";
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
