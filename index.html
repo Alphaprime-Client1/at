@@ -546,84 +546,82 @@ function goHome() {
 
 
 /* =====================================
-   PRIME SECRET TEXT FILE DOWNLOAD
+   PRIME: DOWNLOAD THE REAL GITHUB data.txt
 ===================================== */
 
+/*
+   Keep data.txt in the same GitHub Pages folder as index.html.
+   Example: https://YOUR-USERNAME.github.io/YOUR-REPO/data.txt
+*/
 
-/* EDIT YOUR SECRET DATA HERE */
-
-const secretMessage = `
-
-
-data
-
-
-
-
-
-`;
-
-
-/* CREATE AND DOWNLOAD TXT FILE */
-
-function downloadSecretFile() {
+async function downloadSecretFile() {
+    let fileURL = null;
 
     try {
+        console.log("%c Fetching GitHub data.txt...", "color:#555;font-weight:bold;");
 
-        // Create text file content
+        // Resolve data.txt relative to this page, so it also works on
+        // GitHub Pages project sites (where the repository has a subfolder).
+        const dataFileURL = new URL("./data.txt", window.location.href);
+        dataFileURL.searchParams.set("_prime", Date.now().toString());
 
-        const blob = new Blob(
-            [secretMessage],
-            {
-                type: "text/plain;charset=utf-8"
-            }
-        );
+        const response = await fetch(dataFileURL.href, {
+            method: "GET",
+            cache: "no-store"
+        });
 
+        if (!response.ok) {
+            throw new Error(
+                `Could not load data.txt (HTTP ${response.status}). Check that data.txt is in the same folder as index.html and has been pushed to GitHub.`
+            );
+        }
 
-        // Generate temporary file URL
+        // Read the actual contents of the GitHub-hosted file.
+        const fileContents = await response.text();
 
-        const fileURL = URL.createObjectURL(blob);
+        if (!fileContents.length) {
+            throw new Error("data.txt was found, but the file is empty.");
+        }
 
+        // Create a local download containing the exact fetched text.
+        const blob = new Blob([fileContents], {
+            type: "text/plain;charset=utf-8"
+        });
 
-        // Create download link
+        fileURL = URL.createObjectURL(blob);
 
         const downloadLink = document.createElement("a");
-
         downloadLink.href = fileURL;
-
-        downloadLink.download = "prime-secret.txt";
-
-
-        // Trigger download
+        downloadLink.download = "data.txt";
+        downloadLink.style.display = "none";
 
         document.body.appendChild(downloadLink);
-
         downloadLink.click();
+        downloadLink.remove();
 
-        document.body.removeChild(downloadLink);
+        console.log(
+            "%c PRIME SUCCESS: data.txt download was requested.",
+            "color:#16a34a;font-weight:bold;"
+        );
 
+        return "PRIME ACCESS GRANTED — data.txt download requested.";
 
-        // Release temporary URL
+    } catch (error) {
+        console.error("PRIME DOWNLOAD ERROR:", error);
+        console.error(
+            "Check: (1) data.txt is beside index.html, " +
+            "(2) both files are pushed to GitHub, and " +
+            "(3) the page is opened through your GitHub Pages website."
+        );
 
-        setTimeout(function() {
+        return "PRIME FAILED — see the console error above.";
 
-            URL.revokeObjectURL(fileURL);
-
-        }, 2000);
-
-
-        return "SECRET FILE DOWNLOADED SUCCESSFULLY!";
-
+    } finally {
+        if (fileURL) {
+            // Give the browser time to start the download before cleanup.
+            setTimeout(() => URL.revokeObjectURL(fileURL), 10000);
+        }
     }
-
-    catch (error) {
-
-        console.error("Download failed:", error);
-
-        return "DOWNLOAD FAILED!";
-
-    }
-
 }
 
 
@@ -631,38 +629,22 @@ function downloadSecretFile() {
    HIDDEN CONSOLE COMMAND
 ===================================== */
 
-
-/* TYPE PRIME IN BROWSER CONSOLE */
+/* Type PRIME in the browser DevTools Console. */
 
 Object.defineProperty(window, "PRIME", {
-
     configurable: true,
-
-    get: function() {
-
+    get: function () {
         console.log(
             "%c ⚡ PRIME ACTIVATED ",
             "background:#1c1b19;color:#ed352b;font-size:20px;font-weight:bold;padding:12px;"
         );
 
-
-        // Download secret text file
-
-        const result = downloadSecretFile();
-
-
-        console.log(
-            "%c" + result,
-            "color:#16a34a;font-size:14px;font-weight:bold;"
-        );
-
+        // Fetch the real data.txt file and download it.
+        void downloadSecretFile();
 
         return "PRIME ACCESS GRANTED";
-
     }
-
 });
-
 
 </script>
 
